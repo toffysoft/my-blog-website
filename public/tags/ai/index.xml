@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>AI on Toffysoft&#39;s Blog</title>
+    <link>http://localhost:1313/tags/ai/</link>
+    <description>Recent content in AI on Toffysoft&#39;s Blog</description>
+    <image>
+      <title>Toffysoft&#39;s Blog</title>
+      <url>http://localhost:1313/images/papermod-cover.png</url>
+      <link>http://localhost:1313/images/papermod-cover.png</link>
+    </image>
+    <generator>Hugo -- 0.143.0</generator>
+    <language>th-th</language>
+    <lastBuildDate>Sun, 02 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/ai/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ลองเล่น Local LLM ด้วย Ollama &#43; Python</title>
+      <link>http://localhost:1313/posts/ollama-python/</link>
+      <pubDate>Sun, 02 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/ollama-python/</guid>
+      <description>มาเรียนรู้การใช้งาน Local LLM ผ่าน Ollama ร่วมกับ Python เพื่อสร้าง AI Application แบบ Privacy-First</description>
+    </item>
+  </channel>
+</rss>

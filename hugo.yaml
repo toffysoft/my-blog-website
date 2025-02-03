@@ -1,0 +1,117 @@
+baseURL: https://toffysoft.online/
+languageCode: th-th
+title: Toffysoft's Blog
+pagination: 
+  pagerSize: 5
+theme: PaperMod
+
+enableInlineShortcodes: true
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+pygmentsUseClasses: true
+mainsections: ["posts"]
+
+minify:
+  disableXML: true
+  # minifyOutput: true
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+params:
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  description: "Toffysoft - https://github.com/toffysoft"
+  author: Toffysoft
+
+  defaultTheme: light
+  # disableThemeToggle: true
+  ShowShareButtons: true
+  ShowReadingTime: true
+  # disableSpecial1stPost: true
+  displayFullLangName: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowAllPagesInArchive: true
+  ShowPageNums: true
+  ShowToc: true
+  # comments: false
+  images: ["images/papermod-cover.png"]
+
+  profileMode:
+    enabled: false
+
+  homeInfoParams:
+    Title: "Toffysoft's Blog"
+    Content: >
+      สวัสดีครับ บล็อกนี้เป็นพื้นที่ที่ผมจะแบ่งปันความรู้ ประสบการณ์ และแนวทางการแก้ปัญหาต่างๆ ที่พบเจอระหว่างการทำงานทางด้าน Backend Development โดยเฉพาะการทำงานกับ Go, Docker และ Kubernetes
+      ปัจจุบันกำลังสนใจด้าน LLM เพื่อนำมาประยุกต์ใช้กับงาน หวังว่าจะเป็นประโยชน์สำหรับผู้ที่สนใจในด้านเดียวกันครับ...
+
+  socialIcons:
+    - name: github
+      title: View Source on Github
+      url: "https://github.com/toffysoft"
+    - name: linkedin
+      title: Connect on LinkedIn
+      url: "https://www.linkedin.com/in/apiwat-ruangkanjanapaisarn-16914339/"
+    - name: facebook
+      title: Follow on Facebook
+      url: "https://www.facebook.com/toffysoft"
+
+  label:
+    text: "Toffysoft"
+    icon: /images/toffysoft.jpeg
+    iconHeight: 35
+
+  # analytics:
+  #     google:
+  #         SiteVerificationTag: "XYZabc"
+
+  assets:
+    disableHLJS: false # to disable highlight.js
+    disableFingerprinting: false
+    favicon: /favicon.ico
+    favicon16x16: /favicon-16x16.png
+    favicon32x32: /favicon-32x32.png
+    apple_touch_icon: /apple-touch-icon.png
+  #     safari_pinned_tab: "<link / abs url>"
+
+menu:
+  main:
+    - name: Posts
+      url: posts/
+      weight: 10
+    - name: Search
+      url: search/
+      weight: 20
+    - name: Tags
+      url: tags
+      weight: 30
+    - name: Archive
+      url: archives/
+      weight: 40
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+    # anchorLineNos: true
+    # codeFences: true
+    # guessSyntax: true
+    # lineNos: true
+    # style: monokai
+
+services:
+  instagram:
+    disableInlineCSS: true
+  twitter:
+    disableInlineCSS: true
