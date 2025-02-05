@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Langgraph on Toffysoft&#39;s Blog</title>
+    <link>http://localhost:1313/tags/langgraph/</link>
+    <description>Recent content in Langgraph on Toffysoft&#39;s Blog</description>
+    <image>
+      <title>Toffysoft&#39;s Blog</title>
+      <url>http://localhost:1313/images/papermod-cover.png</url>
+      <link>http://localhost:1313/images/papermod-cover.png</link>
+    </image>
+    <generator>Hugo -- 0.143.0</generator>
+    <language>th-th</language>
+    <lastBuildDate>Wed, 05 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/langgraph/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph</title>
+      <link>http://localhost:1313/posts/agent-example/</link>
+      <pubDate>Wed, 05 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agent-example/</guid>
+      <description>มาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite ด้วย Deepseek-R1 และ Langgraph กัน</description>
+    </item>
+  </channel>
+</rss>

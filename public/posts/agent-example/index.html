@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph | Toffysoft&#39;s Blog</title>
+<meta name="keywords" content="AI, LLM, Python, Ollama, Local Development, Langgraph, Deepseek, Sqlite">
+<meta name="description" content="มาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite ด้วย Deepseek-R1 และ Langgraph กัน">
+<meta name="author" content="Apiwat Ruangkanjanapaisarn">
+<link rel="canonical" href="http://localhost:1313/posts/agent-example/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.2d6240e602c0dc461084f6be8e56c708e5e1efe1df0e71e2e8d12c0b5b8047a9.css" integrity="sha256-LWJA5gLA3EYQhPa&#43;jlbHCOXh7&#43;HfDnHi6NEsC1uAR6k=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/agent-example/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript><meta property="og:url" content="http://localhost:1313/posts/agent-example/">
+  <meta property="og:site_name" content="Toffysoft&#39;s Blog">
+  <meta property="og:title" content="ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph">
+  <meta property="og:description" content="มาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite ด้วย Deepseek-R1 และ Langgraph กัน">
+  <meta property="og:locale" content="th-th">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-02-05T00:00:00+00:00">
+    <meta property="article:modified_time" content="2025-02-05T00:00:00+00:00">
+    <meta property="article:tag" content="AI">
+    <meta property="article:tag" content="LLM">
+    <meta property="article:tag" content="Python">
+    <meta property="article:tag" content="Ollama">
+    <meta property="article:tag" content="Local Development">
+    <meta property="article:tag" content="Langgraph">
+    <meta property="og:image" content="https://www.kdnuggets.com/wp-content/uploads/awan_deepseekr1_locally_4.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://www.kdnuggets.com/wp-content/uploads/awan_deepseekr1_locally_4.png">
+<meta name="twitter:title" content="ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph">
+<meta name="twitter:description" content="มาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite ด้วย Deepseek-R1 และ Langgraph กัน">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph",
+      "item": "http://localhost:1313/posts/agent-example/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph",
+  "name": "ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph",
+  "description": "มาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite ด้วย Deepseek-R1 และ Langgraph กัน",
+  "keywords": [
+    "AI", "LLM", "Python", "Ollama", "Local Development", "Langgraph", "Deepseek", "Sqlite"
+  ],
+  "articleBody": "ในบทความนี้เราจะมาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite โดยใช้ Deepseek-R1 ซึ่งเป็น Open Source Language Model ร่วมกับ Langgraph ซึ่งเป็นเครื่องมือสำหรับสร้าง AI workflows แบบใหม่จาก LangChain\nโครงสร้างของโปรเจค โปรเจคของเราประกอบด้วยไฟล์หลัก 2 ไฟล์:\nsetup.py - สำหรับสร้างและจัดการฐานข้อมูล SQLite agent.py - สำหรับสร้าง AI Agent ที่จะโต้ตอบกับฐานข้อมูล การสร้างฐานข้อมูล เริ่มต้นจาก setup.py ที่ใช้สร้างฐานข้อมูลสินค้าตัวอย่าง โดยมีตาราง products ที่เก็บข้อมูลต่างๆ เช่น:\nid (PRIMARY KEY) name price category stock description last_updated โค้ดส่วนนี้จะสร้างฐานข้อมูลพร้อมข้อมูลตัวอย่างกว่า 100 รายการ แบ่งเป็นหมวดหมู่ต่างๆ เช่น Smartphones, Laptops, TVs, Audio เป็นต้น\n# setup.py import sqlite3 import os from datetime import datetime def init_database(): try: db_path = os.path.join(os.path.dirname(__file__), 'products.db') conn = sqlite3.connect(db_path) cursor = conn.cursor() cursor.execute('DROP TABLE IF EXISTS products') cursor.execute(''' CREATE TABLE IF NOT EXISTS products ( id INTEGER PRIMARY KEY, name TEXT NOT NULL, price REAL NOT NULL, category TEXT NOT NULL, stock INTEGER NOT NULL, description TEXT, last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ) ''') cursor.execute('CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)') cursor.execute('CREATE INDEX IF NOT EXISTS idx_products_price ON products(price)') cursor.execute('CREATE INDEX IF NOT EXISTS idx_products_stock ON products(stock)') products_data = [ # Smartphones (1, 'iPhone 15 Pro Max', 48900.00, 'Smartphones', 45, '1TB storage, titanium finish'), (2, 'iPhone 15 Pro', 42900.00, 'Smartphones', 50, '256GB storage, A17 Pro chip'), (3, 'iPhone 15', 32900.00, 'Smartphones', 60, '128GB storage, A16 chip'), (4, 'Samsung Galaxy S24 Ultra', 45900.00, 'Smartphones', 40, '512GB storage, S Pen included'), (5, 'Samsung Galaxy S24+', 35900.00, 'Smartphones', 45, '256GB storage, AI features'), (6, 'Samsung Galaxy S24', 29900.00, 'Smartphones', 55, '128GB storage'), (7, 'Google Pixel 8 Pro', 35900.00, 'Smartphones', 35, 'Advanced AI camera features'), (8, 'Google Pixel 8', 27900.00, 'Smartphones', 40, 'Android flagship'), (9, 'OnePlus 12', 31900.00, 'Smartphones', 30, 'Snapdragon 8 Gen 3'), (10, 'Xiaomi 14 Pro', 29900.00, 'Smartphones', 40, 'Leica optics'), # Laptops (11, 'MacBook Pro 16\"', 89900.00, 'Laptops', 25, 'M3 Max chip, 32GB RAM'), ........ ] cursor.executemany(''' INSERT OR REPLACE INTO products (id, name, price, category, stock, description) VALUES (?, ?, ?, ?, ?, ?) ''', products_data) conn.commit() print(\"Database initialized successfully!\") return conn except sqlite3.Error as e: print(f\"SQLite error: {e}\") return None except Exception as e: print(f\"Error: {e}\") return None def main(): conn = init_database() if not conn: print(\"Failed to initialize database\") return if __name__ == \"__main__\": main() เราสามารถสร้างฐานข้อมูลด้วยคำสั่ง:\npython setup.py การสร้าง AI Agent ส่วนที่น่าสนใจที่สุดคือการสร้าง AI Agent ใน agent.py โดยใช้ Langgraph ร่วมกับ Deepseek-R1 โดยมีองค์ประกอบหลักๆ ดังนี้:\nPre-requisites pip install langchain langgraph langchain_core langchain_ollama 1. SQLite Tools เราสร้างคลาส SQLiteTools เพื่อจัดการการทำงานกับฐานข้อมูล:\nclass SQLiteTools: def __init__(self, db_path: str): self.db_path = db_path def execute_query(self, query: str) -\u003e List[Tuple]: \"\"\" Function to execute SQL queries \"\"\" try: with sqlite3.connect(self.db_path) as conn: cursor = conn.cursor() cursor.execute(query) return cursor.fetchall() except Exception as e: return f\"Error execute_query occurred: {str(e)}\" def get_table_schema(self, *args) -\u003e Dict[str, List[str]]: \"\"\"Get schema information for all tables\"\"\" try: with sqlite3.connect(self.db_path) as conn: cursor = conn.cursor() cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table';\") tables = cursor.fetchall() schema = {} for table in tables: table_name = table[0] cursor.execute(f\"PRAGMA table_info({table_name})\") columns = cursor.fetchall() schema[table_name] = [ { \"name\": col[1], \"type\": col[2], \"notnull\": col[3], \"pk\": col[5] } for col in columns ] return schema except Exception as e: return f\"Error get_table_schema occurred: {str(e)}\" 2. สร้าง AI Agent class SQLiteAgent: def __init__(self, db_path: str, model_name: str = \"deepseek-r1:8b\"): self.db_tools = SQLiteTools(db_path) 2.1. การตั้งค่า LLM เราใช้ Deepseek-R1 ผ่าน Ollama โดยตั้งค่าดังนี้:\nself.llm = ChatOllama( model=model_name, temperature=0, # ความแปรปรวนในการสร้างข้อความ ใช้ 0 สำหรับความแม่นยำสูงสุด callbacks=[StreamingStdOutCallbackHandler()], base_url=\"http://localhost:11434\", streaming=True ) 2.2. การสร้าง Tools Agent ของเราสามารถใช้งาน tools 2 อย่างคือ:\nexecute_query - สำหรับ execute SQL query get_schema - สำหรับดูโครงสร้างฐานข้อมูล self.tools = [ Tool( name=\"execute_query\", func=self.db_tools.execute_query, description=\"Execute a SQL query. Input should be a valid SQL query string.\" ), Tool( name=\"get_schema\", func=self.db_tools.get_table_schema, description=\"Get the database schema. No input needed.\" ) ] 2.3. การสร้าง Prompt Template เราสร้าง prompt template ที่กำหนดรูปแบบการคิดและตอบของ AI:\nself.prompt = ChatPromptTemplate.from_messages([ (\"system\", \"\"\"You are a SQL database assistant. Follow the format below EXACTLY, including EXACT spacing and punctuation: Thought: [your reasoning] Action: [tool name] Action Input: [tool input] Observation: [tool output] ... (this Thought/Action/Action Input/Observation can repeat if needed) Thought: [your conclusion] Final Answer: [your response] Available tools: {tool_names} {tools} Remember: 1. ALWAYS start with \"Thought:\" 2. ALWAYS include \"Action:\" after \"Thought:\" 3. ALWAYS follow the exact format above 4. NEVER include multiple actions without observations between them 5. NEVER skip steps in the format\"\"\"), (\"human\", \"{input}\"), (\"ai\", \"{agent_scratchpad}\") ]) 2.4. สร้าง Agent และ Workflow สร้าง state schema สำหรับ agent:\nclass AgentState(TypedDict): input: str output: Any messages: List[Any] Langgraph ช่วยให้เราสร้าง workflow แบบ state-based ได้ง่าย:\nself.agent = create_react_agent( llm=self.llm, tools=self.tools, prompt=self.prompt ) self.agent_executor = AgentExecutor( agent=self.agent, tools=self.tools, verbose=True, return_intermediate_steps=True, # สำหรับการแสดงข้อความระหว่างการทำงาน handle_parsing_errors=True, # จัดการข้อผิดพลาดในการแปลงข้อความ max_iterations=5 # จำกัดจำนวนรอบการทำงาน (เพื่อป้องกันการวนลูป) ) def run(self, query: str) -\u003e Any: \"\"\" Run Agent to process queries \"\"\" try: def process_agent(state: Dict) -\u003e Dict: # Call agent executor result = self.agent_executor.invoke({ \"input\": state[\"input\"], \"agent_scratchpad\": state.get(\"messages\", []) }) # Create messages messages = [] if \"intermediate_steps\" in result: for step in result[\"intermediate_steps\"]: action, output = step messages.extend([ AIMessage(content=str(action)), HumanMessage(content=str(output)) ]) # Update state return { \"input\": state[\"input\"], \"output\": result.get(\"output\", \"\"), \"messages\": messages } workflow = StateGraph(state_schema=AgentState) workflow.add_node(\"agent\", process_agent) workflow.set_entry_point(\"agent\") workflow.add_edge(\"agent\", END) app = workflow.compile() # Create initial state initial_state = { \"input\": query, \"output\": None, \"messages\": [] } # Run workflow result = app.invoke(initial_state) # Get results return result[\"output\"] except ValueError as e: if \"Could not parse LLM output\" in str(e): return f\"Error: The model response could not be parsed. Original query: {query}\" raise except Exception as e: return f\"An error occurred: {str(e)}\" การใช้งาน สร้าง function สำหรับเรียกใช้งาน agent:\n# Usage example # Command line interface if __name__ == \"__main__\": import argparse import sys # สร้าง argument parser parser = argparse.ArgumentParser(description='SQLite AI Assistant') parser.add_argument('--db', type=str, default=\"products.db\", help='Database file path') parser.add_argument('--model', type=str, default=\"deepseek-r1:8b\", help='Ollama model name') parser.add_argument('prompt', type=str, nargs='+', help='Natural language prompt') # Parse arguments args = parser.parse_args() # สร้าง Agent agent = SQLiteAgent(args.db, model_name=args.model) try: # รวมคำสั่งเป็น string เดียว prompt = ' '.join(args.prompt) # ส่งคำสั่งไปให้ agent result = agent.run(prompt) print(result) except Exception as e: print(f\"เกิดข้อผิดพลาด: {str(e)}\") เราสามารถใช้งาน AI Agent ผ่าน command line ได้ดังนี้:\npython agent.py \"Show me 10 products under 20000\" Result: Agent สามารถ:\nเข้าใจคำถามภาษาธรรมชาติ แปลงเป็น SQL query ส่ง query ไปยังฐานข้อมูล แปลงผลลัพธ์กลับมาเป็นภาษาธรรมชาติ สร้าง API สำหรับโต้ตอบกับ agent ผ่าน HTTP request ด้วย FastAPI Pre-requisites:\npip install fastapi uvicorn เพิ่มไฟล์ api.py สำหรับสร้าง API ที่ใช้งาน agent:\n# api.py from fastapi import FastAPI, HTTPException from fastapi.middleware.cors import CORSMiddleware from pydantic import BaseModel import asyncio from typing import Optional import uvicorn from agent import SQLiteAgent class QueryRequest(BaseModel): query: str model_name: Optional[str] = \"deepseek-r1:8b\" db_path: Optional[str] = \"products.db\" class QueryResponse(BaseModel): result: str error: Optional[str] = None app = FastAPI(title=\"SQLite AI Assistant\") app.add_middleware( CORSMiddleware, allow_origins=[\"*\"], allow_credentials=True, allow_methods=[\"*\"], allow_headers=[\"*\"], ) @app.post(\"/query\", response_model=QueryResponse) async def process_query(request: QueryRequest): try: agent = SQLiteAgent(request.db_path, model_name=request.model_name) result = agent.run(request.query) return QueryResponse(result=str(result)) except Exception as e: raise HTTPException(status_code=500, detail=str(e)) def run_fastapi(): uvicorn.run(app, host=\"0.0.0.0\", port=8000) if __name__ == \"__main__\": run_fastapi() รัน API ด้วยคำสั่ง:\npython api.py เราสามารถใช้งาน agent ผ่าน API ได้ดังนี้:\nสร้าง web interface สำหรับโต้ตอบกับ agent Pre-requisites:\npip install streamlit เพิ่มไฟล์ app.py สำหรับสร้าง web interface ที่ใช้งาน agent:\n# app.py import streamlit as st import json from agent import SQLiteAgent def main(): st.set_page_config( page_title=\"SQLite AI Assistant\", page_icon=\"🤖\", layout=\"wide\" ) st.title(\"🤖 SQLite AI Assistant\") # Sidebar configuration with st.sidebar: st.header(\"⚙️ Configuration\") model_name = st.selectbox( \"Select Model\", [\"deepseek-r1:8b\"], index=0 ) db_path = st.text_input( \"Database Path\", value=\"products.db\" ) st.markdown(\"---\") st.markdown(\"\"\" ### Example Queries: - show database schema - show first 5 rows from products table - count total records in products table \"\"\") # Main content query = st.text_area(\"Enter your query:\", height=100) if st.button(\"🚀 Execute Query\", type=\"primary\"): if query: try: with st.spinner(\"Processing...\"): # Create agent and process query agent = SQLiteAgent(db_path, model_name=model_name) result = agent.run(query) # Show results st.success(\"Query executed successfully!\") # Add to history if 'history' not in st.session_state: st.session_state.history = [] st.session_state.history.append((query, result)) # Check if result is JSON try: if isinstance(result, str): json_result = json.loads(result) st.json(json_result) else: st.write(result) except: st.write(result) except Exception as e: st.error(f\"Error: {str(e)}\") else: st.warning(\"Please enter a query\") # History section with st.expander(\"📜 Query History\", expanded=False): if 'history' not in st.session_state: st.session_state.history = [] # Show query history for idx, (past_query, past_result) in enumerate(st.session_state.history): st.markdown(f\"**Query {idx+1}:** {past_query}\") st.markdown(f\"**Result:** {past_result}\") st.markdown(\"---\") if __name__ == \"__main__\": main() รัน web interface ด้วยคำสั่ง:\nstreamlit run app.py เราสามารถใช้งาน agent ผ่าน web interface ได้ดังนี้:\nสรุป การใช้ Langgraph ร่วมกับ Deepseek-R1 ทำให้เราสามารถสร้าง AI Agent ที่ชาญฉลาดได้ง่ายขึ้น โดย:\nLanggraph ช่วยจัดการ workflow ของ agent Deepseek-R1 ให้ความสามารถในการเข้าใจภาษาธรรมชาติและแปลงเป็น SQL ระบบ tools ช่วยให้ agent มีความสามารถที่หลากหลาย นี่เป็นเพียงตัวอย่างเบื้องต้น เรายังสามารถพัฒนาต่อยอดได้อีกมาก เช่น:\nเพิ่ม tools ให้ทำงานอื่นๆ ได้ ปรับปรุง prompt template ให้ฉลาดขึ้น เพิ่มความสามารถในการจดจำบริบทการสนทนา อ้างอิง GitHub Repo Langgraph Documentation Deepseek-R1 Ollama ",
+  "wordCount" : "1347",
+  "inLanguage": "en",
+  "image":"https://www.kdnuggets.com/wp-content/uploads/awan_deepseekr1_locally_4.png","datePublished": "2025-02-05T00:00:00Z",
+  "dateModified": "2025-02-05T00:00:00Z",
+  "author":{
+    "@type": "Person",
+    "name": "Apiwat Ruangkanjanapaisarn"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/agent-example/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Toffysoft's Blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Toffysoft (Alt + H)">
+                        
+                    <img src="http://localhost:1313/images/toffysoft_hu_7003f3165263a7ac.jpeg" alt="" aria-label="logo"
+                        height="35">Toffysoft</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/posts/" title="Posts">
+                    <span>Posts</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph
+    </h1>
+    <div class="post-description">
+      มาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite ด้วย Deepseek-R1 และ Langgraph กัน
+    </div>
+    <div class="post-meta"><span title='2025-02-05 00:00:00 +0000 UTC'>February 5, 2025</span>&nbsp;·&nbsp;7 min&nbsp;·&nbsp;Apiwat Ruangkanjanapaisarn
+
+</div>
+  </header> 
+<figure class="entry-cover"><img loading="eager" src="https://www.kdnuggets.com/wp-content/uploads/awan_deepseekr1_locally_4.png" alt="Image from (https://www.kdnuggets.com/using-deepseek-r1-locally)">
+        <p>Image from (<a href="https://www.kdnuggets.com/using-deepseek-r1-locally">https://www.kdnuggets.com/using-deepseek-r1-locally</a>)</p>
+</figure><div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e0%b9%82%e0%b8%84%e0%b8%a3%e0%b8%87%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87%e0%b8%82%e0%b8%ad%e0%b8%87%e0%b9%82%e0%b8%9b%e0%b8%a3%e0%b9%80%e0%b8%88%e0%b8%84" aria-label="โครงสร้างของโปรเจค">โครงสร้างของโปรเจค</a></li>
+                <li>
+                    <a href="#%e0%b8%81%e0%b8%b2%e0%b8%a3%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87%e0%b8%90%e0%b8%b2%e0%b8%99%e0%b8%82%e0%b8%ad%e0%b8%a1%e0%b8%a5" aria-label="การสร้างฐานข้อมูล">การสร้างฐานข้อมูล</a></li>
+                <li>
+                    <a href="#%e0%b8%81%e0%b8%b2%e0%b8%a3%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87-ai-agent" aria-label="การสร้าง AI Agent">การสร้าง AI Agent</a><ul>
+                        
+                <li>
+                    <a href="#pre-requisites" aria-label="Pre-requisites">Pre-requisites</a></li>
+                <li>
+                    <a href="#1-sqlite-tools" aria-label="1. SQLite Tools">1. SQLite Tools</a></li>
+                <li>
+                    <a href="#2-%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87-ai-agent" aria-label="2. สร้าง AI Agent">2. สร้าง AI Agent</a></li>
+                <li>
+                    <a href="#21-%e0%b8%81%e0%b8%b2%e0%b8%a3%e0%b8%95%e0%b8%87%e0%b8%84%e0%b8%b2-llm" aria-label="2.1. การตั้งค่า LLM">2.1. การตั้งค่า LLM</a></li>
+                <li>
+                    <a href="#22-%e0%b8%81%e0%b8%b2%e0%b8%a3%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87-tools" aria-label="2.2. การสร้าง Tools">2.2. การสร้าง Tools</a></li>
+                <li>
+                    <a href="#23-%e0%b8%81%e0%b8%b2%e0%b8%a3%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87-prompt-template" aria-label="2.3. การสร้าง Prompt Template">2.3. การสร้าง Prompt Template</a></li>
+                <li>
+                    <a href="#24-%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87-agent-%e0%b9%81%e0%b8%a5%e0%b8%b0-workflow" aria-label="2.4. สร้าง Agent และ Workflow">2.4. สร้าง Agent และ Workflow</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e0%b8%81%e0%b8%b2%e0%b8%a3%e0%b9%83%e0%b8%8a%e0%b8%87%e0%b8%b2%e0%b8%99" aria-label="การใช้งาน">การใช้งาน</a></li>
+                <li>
+                    <a href="#%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87-api-%e0%b8%aa%e0%b8%b3%e0%b8%ab%e0%b8%a3%e0%b8%9a%e0%b9%82%e0%b8%95%e0%b8%95%e0%b8%ad%e0%b8%9a%e0%b8%81%e0%b8%9a-agent-%e0%b8%9c%e0%b8%b2%e0%b8%99-http-request-%e0%b8%94%e0%b8%a7%e0%b8%a2-fastapi" aria-label="สร้าง API สำหรับโต้ตอบกับ agent ผ่าน HTTP request ด้วย FastAPI">สร้าง API สำหรับโต้ตอบกับ agent ผ่าน HTTP request ด้วย FastAPI</a></li>
+                <li>
+                    <a href="#%e0%b8%aa%e0%b8%a3%e0%b8%b2%e0%b8%87-web-interface-%e0%b8%aa%e0%b8%b3%e0%b8%ab%e0%b8%a3%e0%b8%9a%e0%b9%82%e0%b8%95%e0%b8%95%e0%b8%ad%e0%b8%9a%e0%b8%81%e0%b8%9a-agent" aria-label="สร้าง web interface สำหรับโต้ตอบกับ agent">สร้าง web interface สำหรับโต้ตอบกับ agent</a></li>
+                <li>
+                    <a href="#%e0%b8%aa%e0%b8%a3%e0%b8%9b" aria-label="สรุป">สรุป</a></li>
+                <li>
+                    <a href="#%e0%b8%ad%e0%b8%b2%e0%b8%87%e0%b8%ad%e0%b8%87" aria-label="อ้างอิง">อ้างอิง</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>ในบทความนี้เราจะมาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite โดยใช้ Deepseek-R1 ซึ่งเป็น Open Source Language Model ร่วมกับ Langgraph ซึ่งเป็นเครื่องมือสำหรับสร้าง AI workflows แบบใหม่จาก LangChain</p>
+<h2 id="โครงสรางของโปรเจค">โครงสร้างของโปรเจค<a hidden class="anchor" aria-hidden="true" href="#โครงสรางของโปรเจค">#</a></h2>
+<p>โปรเจคของเราประกอบด้วยไฟล์หลัก 2 ไฟล์:</p>
+<ol>
+<li><code>setup.py</code> - สำหรับสร้างและจัดการฐานข้อมูล SQLite</li>
+<li><code>agent.py</code> - สำหรับสร้าง AI Agent ที่จะโต้ตอบกับฐานข้อมูล</li>
+</ol>
+<h2 id="การสรางฐานขอมล">การสร้างฐานข้อมูล<a hidden class="anchor" aria-hidden="true" href="#การสรางฐานขอมล">#</a></h2>
+<p>เริ่มต้นจาก <code>setup.py</code> ที่ใช้สร้างฐานข้อมูลสินค้าตัวอย่าง โดยมีตาราง products ที่เก็บข้อมูลต่างๆ เช่น:</p>
+<ul>
+<li>id (PRIMARY KEY)</li>
+<li>name</li>
+<li>price</li>
+<li>category</li>
+<li>stock</li>
+<li>description</li>
+<li>last_updated</li>
+</ul>
+<p>โค้ดส่วนนี้จะสร้างฐานข้อมูลพร้อมข้อมูลตัวอย่างกว่า 100 รายการ แบ่งเป็นหมวดหมู่ต่างๆ เช่น Smartphones, Laptops, TVs, Audio เป็นต้น</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># setup.py</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">sqlite3</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">init_database</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">db_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;products.db&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;DROP TABLE IF EXISTS products&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">        CREATE TABLE IF NOT EXISTS products (
+</span></span></span><span class="line"><span class="cl"><span class="s1">            id INTEGER PRIMARY KEY,
+</span></span></span><span class="line"><span class="cl"><span class="s1">            name TEXT NOT NULL,
+</span></span></span><span class="line"><span class="cl"><span class="s1">            price REAL NOT NULL,
+</span></span></span><span class="line"><span class="cl"><span class="s1">            category TEXT NOT NULL,
+</span></span></span><span class="line"><span class="cl"><span class="s1">            stock INTEGER NOT NULL,
+</span></span></span><span class="line"><span class="cl"><span class="s1">            description TEXT,
+</span></span></span><span class="line"><span class="cl"><span class="s1">            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+</span></span></span><span class="line"><span class="cl"><span class="s1">        )
+</span></span></span><span class="line"><span class="cl"><span class="s1">        &#39;&#39;&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX IF NOT EXISTS idx_products_price ON products(price)&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;CREATE INDEX IF NOT EXISTS idx_products_stock ON products(stock)&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">products_data</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># Smartphones</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;iPhone 15 Pro Max&#39;</span><span class="p">,</span> <span class="mf">48900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="s1">&#39;1TB storage, titanium finish&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;iPhone 15 Pro&#39;</span><span class="p">,</span> <span class="mf">42900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;256GB storage, A17 Pro chip&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;iPhone 15&#39;</span><span class="p">,</span> <span class="mf">32900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="s1">&#39;128GB storage, A16 chip&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Samsung Galaxy S24 Ultra&#39;</span><span class="p">,</span> <span class="mf">45900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;512GB storage, S Pen included&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;Samsung Galaxy S24+&#39;</span><span class="p">,</span> <span class="mf">35900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="s1">&#39;256GB storage, AI features&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;Samsung Galaxy S24&#39;</span><span class="p">,</span> <span class="mf">29900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="s1">&#39;128GB storage&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;Google Pixel 8 Pro&#39;</span><span class="p">,</span> <span class="mf">35900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="s1">&#39;Advanced AI camera features&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;Google Pixel 8&#39;</span><span class="p">,</span> <span class="mf">27900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;Android flagship&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="s1">&#39;OnePlus 12&#39;</span><span class="p">,</span> <span class="mf">31900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="s1">&#39;Snapdragon 8 Gen 3&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;Xiaomi 14 Pro&#39;</span><span class="p">,</span> <span class="mf">29900.00</span><span class="p">,</span> <span class="s1">&#39;Smartphones&#39;</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;Leica optics&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1"># Laptops</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="s1">&#39;MacBook Pro 16&#34;&#39;</span><span class="p">,</span> <span class="mf">89900.00</span><span class="p">,</span> <span class="s1">&#39;Laptops&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="s1">&#39;M3 Max chip, 32GB RAM&#39;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="o">........</span>
+</span></span><span class="line"><span class="cl">        <span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;
+</span></span></span><span class="line"><span class="cl"><span class="s1">        INSERT OR REPLACE INTO products (id, name, price, category, stock, description)
+</span></span></span><span class="line"><span class="cl"><span class="s1">        VALUES (?, ?, ?, ?, ?, ?)
+</span></span></span><span class="line"><span class="cl"><span class="s1">        &#39;&#39;&#39;</span><span class="p">,</span> <span class="n">products_data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Database initialized successfully!&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">conn</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;SQLite error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">conn</span> <span class="o">=</span> <span class="n">init_database</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="ow">not</span> <span class="n">conn</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s2">&#34;Failed to initialize database&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
+</span></span></code></pre></div><p>เราสามารถสร้างฐานข้อมูลด้วยคำสั่ง:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">python setup.py
+</span></span></code></pre></div><h2 id="การสราง-ai-agent">การสร้าง AI Agent<a hidden class="anchor" aria-hidden="true" href="#การสราง-ai-agent">#</a></h2>
+<p>ส่วนที่น่าสนใจที่สุดคือการสร้าง AI Agent ใน <code>agent.py</code> โดยใช้ Langgraph ร่วมกับ Deepseek-R1 โดยมีองค์ประกอบหลักๆ ดังนี้:</p>
+<h3 id="pre-requisites">Pre-requisites<a hidden class="anchor" aria-hidden="true" href="#pre-requisites">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">pip install langchain langgraph langchain_core langchain_ollama
+</span></span></code></pre></div><h3 id="1-sqlite-tools">1. SQLite Tools<a hidden class="anchor" aria-hidden="true" href="#1-sqlite-tools">#</a></h3>
+<p>เราสร้างคลาส SQLiteTools เพื่อจัดการการทำงานกับฐานข้อมูล:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">SQLiteTools</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">db_path</span> <span class="o">=</span> <span class="n">db_path</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">execute_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">]:</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">        Function to execute SQL queries
+</span></span></span><span class="line"><span class="cl"><span class="s2">        &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="sa">f</span><span class="s2">&#34;Error execute_query occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">get_table_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span> 
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;Get schema information for all tables&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">with</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">cursor</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&#34;SELECT name FROM sqlite_master WHERE type=&#39;table&#39;;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">tables</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                
+</span></span><span class="line"><span class="cl">                <span class="n">schema</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">                <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">table_name</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                    <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;PRAGMA table_info(</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">)&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">columns</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                    <span class="n">schema</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                            <span class="s2">&#34;name&#34;</span><span class="p">:</span> <span class="n">col</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">                            <span class="s2">&#34;type&#34;</span><span class="p">:</span> <span class="n">col</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">                            <span class="s2">&#34;notnull&#34;</span><span class="p">:</span> <span class="n">col</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">                            <span class="s2">&#34;pk&#34;</span><span class="p">:</span> <span class="n">col</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">}</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="n">schema</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="sa">f</span><span class="s2">&#34;Error get_table_schema occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span></code></pre></div><h3 id="2-สราง-ai-agent">2. สร้าง AI Agent<a hidden class="anchor" aria-hidden="true" href="#2-สราง-ai-agent">#</a></h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">SQLiteAgent</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&#34;deepseek-r1:8b&#34;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">db_tools</span> <span class="o">=</span> <span class="n">SQLiteTools</span><span class="p">(</span><span class="n">db_path</span><span class="p">)</span>
+</span></span></code></pre></div><ul>
+<li>
+<h3 id="21-การตงคา-llm">2.1. การตั้งค่า LLM<a hidden class="anchor" aria-hidden="true" href="#21-การตงคา-llm">#</a></h3>
+</li>
+</ul>
+<p>เราใช้ Deepseek-R1 ผ่าน Ollama โดยตั้งค่าดังนี้:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">llm</span> <span class="o">=</span> <span class="n">ChatOllama</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">model</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="c1"># ความแปรปรวนในการสร้างข้อความ ใช้ 0 สำหรับความแม่นยำสูงสุด</span>
+</span></span><span class="line"><span class="cl">            <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">StreamingStdOutCallbackHandler</span><span class="p">()],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">base_url</span><span class="o">=</span><span class="s2">&#34;http://localhost:11434&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">streaming</span><span class="o">=</span><span class="kc">True</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span></code></pre></div><ul>
+<li>
+<h3 id="22-การสราง-tools">2.2. การสร้าง Tools<a hidden class="anchor" aria-hidden="true" href="#22-การสราง-tools">#</a></h3>
+</li>
+</ul>
+<p>Agent ของเราสามารถใช้งาน tools 2 อย่างคือ:</p>
+<ol>
+<li>execute_query - สำหรับ execute SQL query</li>
+<li>get_schema - สำหรับดูโครงสร้างฐานข้อมูล</li>
+</ol>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Tool</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">              <span class="n">name</span><span class="o">=</span><span class="s2">&#34;execute_query&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">              <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_tools</span><span class="o">.</span><span class="n">execute_query</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">              <span class="n">description</span><span class="o">=</span><span class="s2">&#34;Execute a SQL query. Input should be a valid SQL query string.&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Tool</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                <span class="n">name</span><span class="o">=</span><span class="s2">&#34;get_schema&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_tools</span><span class="o">.</span><span class="n">get_table_schema</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="n">description</span><span class="o">=</span><span class="s2">&#34;Get the database schema. No input needed.&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">]</span>
+</span></span></code></pre></div><ul>
+<li>
+<h3 id="23-การสราง-prompt-template">2.3. การสร้าง Prompt Template<a hidden class="anchor" aria-hidden="true" href="#23-การสราง-prompt-template">#</a></h3>
+</li>
+</ul>
+<p>เราสร้าง prompt template ที่กำหนดรูปแบบการคิดและตอบของ AI:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="n">ChatPromptTemplate</span><span class="o">.</span><span class="n">from_messages</span><span class="p">([</span>
+</span></span><span class="line"><span class="cl">            <span class="p">(</span><span class="s2">&#34;system&#34;</span><span class="p">,</span> <span class="s2">&#34;&#34;&#34;You are a SQL database assistant. Follow the format below EXACTLY, including EXACT spacing and punctuation:
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Thought: [your reasoning]
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Action: [tool name]
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Action Input: [tool input]
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Observation: [tool output]
+</span></span></span><span class="line"><span class="cl"><span class="s2">            ... (this Thought/Action/Action Input/Observation can repeat if needed)
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Thought: [your conclusion]
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Final Answer: [your response]
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Available tools:
+</span></span></span><span class="line"><span class="cl"><span class="s2">            </span><span class="si">{tool_names}</span><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">            </span><span class="si">{tools}</span><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">            Remember:
+</span></span></span><span class="line"><span class="cl"><span class="s2">            1. ALWAYS start with &#34;Thought:&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">            2. ALWAYS include &#34;Action:&#34; after &#34;Thought:&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">            3. ALWAYS follow the exact format above
+</span></span></span><span class="line"><span class="cl"><span class="s2">            4. NEVER include multiple actions without observations between them
+</span></span></span><span class="line"><span class="cl"><span class="s2">            5. NEVER skip steps in the format&#34;&#34;&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">(</span><span class="s2">&#34;human&#34;</span><span class="p">,</span> <span class="s2">&#34;</span><span class="si">{input}</span><span class="s2">&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                    <span class="p">(</span><span class="s2">&#34;ai&#34;</span><span class="p">,</span> <span class="s2">&#34;</span><span class="si">{agent_scratchpad}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">])</span>
+</span></span></code></pre></div><ul>
+<li>
+<h3 id="24-สราง-agent-และ-workflow">2.4. สร้าง Agent และ Workflow<a hidden class="anchor" aria-hidden="true" href="#24-สราง-agent-และ-workflow">#</a></h3>
+</li>
+</ul>
+<p>สร้าง state schema สำหรับ agent:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">AgentState</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">input</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">    <span class="n">output</span><span class="p">:</span> <span class="n">Any</span>
+</span></span><span class="line"><span class="cl">    <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</span></span></code></pre></div><p>Langgraph ช่วยให้เราสร้าง workflow แบบ state-based ได้ง่าย:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">create_react_agent</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">llm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">llm</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">tools</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">agent_executor</span> <span class="o">=</span> <span class="n">AgentExecutor</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="n">agent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">tools</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">return_intermediate_steps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># สำหรับการแสดงข้อความระหว่างการทำงาน</span>
+</span></span><span class="line"><span class="cl">            <span class="n">handle_parsing_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># จัดการข้อผิดพลาดในการแปลงข้อความ</span>
+</span></span><span class="line"><span class="cl">            <span class="n">max_iterations</span><span class="o">=</span><span class="mi">5</span>  <span class="c1"># จำกัดจำนวนรอบการทำงาน (เพื่อป้องกันการวนลูป)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">        Run Agent to process queries
+</span></span></span><span class="line"><span class="cl"><span class="s2">        &#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">          <span class="k">def</span> <span class="nf">process_agent</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">              <span class="c1"># Call agent executor</span>
+</span></span><span class="line"><span class="cl">              <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_executor</span><span class="o">.</span><span class="n">invoke</span><span class="p">({</span>
+</span></span><span class="line"><span class="cl">                  <span class="s2">&#34;input&#34;</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="s2">&#34;input&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">                  <span class="s2">&#34;agent_scratchpad&#34;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;messages&#34;</span><span class="p">,</span> <span class="p">[])</span>
+</span></span><span class="line"><span class="cl">              <span class="p">})</span>
+</span></span><span class="line"><span class="cl">              
+</span></span><span class="line"><span class="cl">              <span class="c1"># Create messages</span>
+</span></span><span class="line"><span class="cl">              <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">              <span class="k">if</span> <span class="s2">&#34;intermediate_steps&#34;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                  <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&#34;intermediate_steps&#34;</span><span class="p">]:</span>
+</span></span><span class="line"><span class="cl">                      <span class="n">action</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="n">step</span>
+</span></span><span class="line"><span class="cl">                      <span class="n">messages</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+</span></span><span class="line"><span class="cl">                          <span class="n">AIMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl">                          <span class="n">HumanMessage</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">output</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">                      <span class="p">])</span>
+</span></span><span class="line"><span class="cl">              
+</span></span><span class="line"><span class="cl">              <span class="c1"># Update state</span>
+</span></span><span class="line"><span class="cl">              <span class="k">return</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                  <span class="s2">&#34;input&#34;</span><span class="p">:</span> <span class="n">state</span><span class="p">[</span><span class="s2">&#34;input&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">                  <span class="s2">&#34;output&#34;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;output&#34;</span><span class="p">,</span> <span class="s2">&#34;&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                  <span class="s2">&#34;messages&#34;</span><span class="p">:</span> <span class="n">messages</span>
+</span></span><span class="line"><span class="cl">              <span class="p">}</span>
+</span></span><span class="line"><span class="cl">          
+</span></span><span class="line"><span class="cl">          <span class="n">workflow</span> <span class="o">=</span> <span class="n">StateGraph</span><span class="p">(</span><span class="n">state_schema</span><span class="o">=</span><span class="n">AgentState</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          
+</span></span><span class="line"><span class="cl">          <span class="n">workflow</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="s2">&#34;agent&#34;</span><span class="p">,</span> <span class="n">process_agent</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          
+</span></span><span class="line"><span class="cl">          <span class="n">workflow</span><span class="o">.</span><span class="n">set_entry_point</span><span class="p">(</span><span class="s2">&#34;agent&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          
+</span></span><span class="line"><span class="cl">          <span class="n">workflow</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&#34;agent&#34;</span><span class="p">,</span> <span class="n">END</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          
+</span></span><span class="line"><span class="cl">          <span class="n">app</span> <span class="o">=</span> <span class="n">workflow</span><span class="o">.</span><span class="n">compile</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">          
+</span></span><span class="line"><span class="cl">          <span class="c1"># Create initial state</span>
+</span></span><span class="line"><span class="cl">          <span class="n">initial_state</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">              <span class="s2">&#34;input&#34;</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">              <span class="s2">&#34;output&#34;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">              <span class="s2">&#34;messages&#34;</span><span class="p">:</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">          <span class="p">}</span>
+</span></span><span class="line"><span class="cl">          
+</span></span><span class="line"><span class="cl">          <span class="c1"># Run workflow</span>
+</span></span><span class="line"><span class="cl">          <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">initial_state</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">          
+</span></span><span class="line"><span class="cl">          <span class="c1"># Get results</span>
+</span></span><span class="line"><span class="cl">          <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="s2">&#34;output&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="s2">&#34;Could not parse LLM output&#34;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="sa">f</span><span class="s2">&#34;Error: The model response could not be parsed. Original query: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">raise</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="sa">f</span><span class="s2">&#34;An error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span>
+</span></span></code></pre></div><h2 id="การใชงาน">การใช้งาน<a hidden class="anchor" aria-hidden="true" href="#การใชงาน">#</a></h2>
+<p>สร้าง function สำหรับเรียกใช้งาน agent:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Usage example</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Command line interface</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">import</span> <span class="nn">argparse</span>
+</span></span><span class="line"><span class="cl">    <span class="kn">import</span> <span class="nn">sys</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># สร้าง argument parser</span>
+</span></span><span class="line"><span class="cl">    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;SQLite AI Assistant&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--db&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&#34;products.db&#34;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Database file path&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--model&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&#34;deepseek-r1:8b&#34;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Ollama model name&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;prompt&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Natural language prompt&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># Parse arguments</span>
+</span></span><span class="line"><span class="cl">    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1"># สร้าง Agent</span>
+</span></span><span class="line"><span class="cl">    <span class="n">agent</span> <span class="o">=</span> <span class="n">SQLiteAgent</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">db</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># รวมคำสั่งเป็น string เดียว</span>
+</span></span><span class="line"><span class="cl">        <span class="n">prompt</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="c1"># ส่งคำสั่งไปให้ agent</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;เกิดข้อผิดพลาด: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>เราสามารถใช้งาน AI Agent ผ่าน command line ได้ดังนี้:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">python agent.py <span class="s2">&#34;Show me 10 products under 20000&#34;</span>
+</span></span></code></pre></div><p>Result:
+<img alt="result1-1" loading="lazy" src="/posts/agent-example/images/result1-1.png">
+<img alt="result1-2" loading="lazy" src="/posts/agent-example/images/result1-2.png">
+<img alt="result1-3" loading="lazy" src="/posts/agent-example/images/result1-3.png"></p>
+<p>Agent สามารถ:</p>
+<ol>
+<li>เข้าใจคำถามภาษาธรรมชาติ</li>
+<li>แปลงเป็น SQL query</li>
+<li>ส่ง query ไปยังฐานข้อมูล</li>
+<li>แปลงผลลัพธ์กลับมาเป็นภาษาธรรมชาติ</li>
+</ol>
+<h2 id="สราง-api-สำหรบโตตอบกบ-agent-ผาน-http-request-ดวย-fastapi">สร้าง API สำหรับโต้ตอบกับ agent ผ่าน HTTP request ด้วย FastAPI<a hidden class="anchor" aria-hidden="true" href="#สราง-api-สำหรบโตตอบกบ-agent-ผาน-http-request-ดวย-fastapi">#</a></h2>
+<p>Pre-requisites:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">pip install fastapi uvicorn
+</span></span></code></pre></div><p>เพิ่มไฟล์ <code>api.py</code> สำหรับสร้าง API ที่ใช้งาน agent:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># api.py</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">fastapi</span> <span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">HTTPException</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">fastapi.middleware.cors</span> <span class="kn">import</span> <span class="n">CORSMiddleware</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">asyncio</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">uvicorn</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">agent</span> <span class="kn">import</span> <span class="n">SQLiteAgent</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">QueryRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">    <span class="n">model_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&#34;deepseek-r1:8b&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">db_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&#34;products.db&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">QueryResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">result</span><span class="p">:</span> <span class="nb">str</span>
+</span></span><span class="line"><span class="cl">    <span class="n">error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&#34;SQLite AI Assistant&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CORSMiddleware</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">allow_origins</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="n">allow_credentials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">allow_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">    <span class="n">allow_headers</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;*&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nd">@app.post</span><span class="p">(</span><span class="s2">&#34;/query&#34;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">QueryResponse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">async</span> <span class="k">def</span> <span class="nf">process_query</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">QueryRequest</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">agent</span> <span class="o">=</span> <span class="n">SQLiteAgent</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">db_path</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">model_name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">QueryResponse</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">run_fastapi</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">uvicorn</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s2">&#34;0.0.0.0&#34;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8000</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">run_fastapi</span><span class="p">()</span>
+</span></span></code></pre></div><p>รัน API ด้วยคำสั่ง:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">python api.py
+</span></span></code></pre></div><p><img alt="api" loading="lazy" src="/posts/agent-example/images/api.png"></p>
+<p>เราสามารถใช้งาน agent ผ่าน API ได้ดังนี้:</p>
+<p><img alt="result2-1" loading="lazy" src="/posts/agent-example/images/result2-1.png"></p>
+<h2 id="สราง-web-interface-สำหรบโตตอบกบ-agent">สร้าง web interface สำหรับโต้ตอบกับ agent<a hidden class="anchor" aria-hidden="true" href="#สราง-web-interface-สำหรบโตตอบกบ-agent">#</a></h2>
+<p>Pre-requisites:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">pip install streamlit
+</span></span></code></pre></div><p>เพิ่มไฟล์ <code>app.py</code> สำหรับสร้าง web interface ที่ใช้งาน agent:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># app.py</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">json</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">agent</span> <span class="kn">import</span> <span class="n">SQLiteAgent</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="n">st</span><span class="o">.</span><span class="n">set_page_config</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">page_title</span><span class="o">=</span><span class="s2">&#34;SQLite AI Assistant&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">page_icon</span><span class="o">=</span><span class="s2">&#34;🤖&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">layout</span><span class="o">=</span><span class="s2">&#34;wide&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">st</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&#34;🤖 SQLite AI Assistant&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># Sidebar configuration</span>
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">st</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s2">&#34;⚙️ Configuration&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">model_name</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">selectbox</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;Select Model&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="p">[</span><span class="s2">&#34;deepseek-r1:8b&#34;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="n">index</span><span class="o">=</span><span class="mi">0</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">db_path</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">text_input</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="s2">&#34;Database Path&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">value</span><span class="o">=</span><span class="s2">&#34;products.db&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">)</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&#34;---&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">        ### Example Queries:
+</span></span></span><span class="line"><span class="cl"><span class="s2">        - show database schema
+</span></span></span><span class="line"><span class="cl"><span class="s2">        - show first 5 rows from products table
+</span></span></span><span class="line"><span class="cl"><span class="s2">        - count total records in products table
+</span></span></span><span class="line"><span class="cl"><span class="s2">        &#34;&#34;&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># Main content</span>
+</span></span><span class="line"><span class="cl">    <span class="n">query</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">text_area</span><span class="p">(</span><span class="s2">&#34;Enter your query:&#34;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&#34;🚀 Execute Query&#34;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&#34;primary&#34;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">spinner</span><span class="p">(</span><span class="s2">&#34;Processing...&#34;</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">                    <span class="c1"># Create agent and process query</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">agent</span> <span class="o">=</span> <span class="n">SQLiteAgent</span><span class="p">(</span><span class="n">db_path</span><span class="p">,</span> <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">result</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    
+</span></span><span class="line"><span class="cl">                    <span class="c1"># Show results</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">st</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="s2">&#34;Query executed successfully!&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    
+</span></span><span class="line"><span class="cl">                    <span class="c1"># Add to history</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">if</span> <span class="s1">&#39;history&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">query</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">                    
+</span></span><span class="line"><span class="cl">                    <span class="c1"># Check if result is JSON</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">                            <span class="n">json_result</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                            <span class="n">st</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="n">json_result</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                            <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">except</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                    
+</span></span><span class="line"><span class="cl">            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">st</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;Error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">st</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&#34;Please enter a query&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1"># History section</span>
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="n">st</span><span class="o">.</span><span class="n">expander</span><span class="p">(</span><span class="s2">&#34;📜 Query History&#34;</span><span class="p">,</span> <span class="n">expanded</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="s1">&#39;history&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">            
+</span></span><span class="line"><span class="cl">        <span class="c1"># Show query history</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">past_query</span><span class="p">,</span> <span class="n">past_result</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">history</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;**Query </span><span class="si">{</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">:** </span><span class="si">{</span><span class="n">past_query</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;**Result:** </span><span class="si">{</span><span class="n">past_result</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="s2">&#34;---&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">main</span><span class="p">()</span>
+</span></span></code></pre></div><p>รัน web interface ด้วยคำสั่ง:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">streamlit run app.py
+</span></span></code></pre></div><p><img alt="app" loading="lazy" src="/posts/agent-example/images/app.png"></p>
+<p>เราสามารถใช้งาน agent ผ่าน web interface ได้ดังนี้:</p>
+<p><img alt="result3-1" loading="lazy" src="/posts/agent-example/images/result3-1.png"></p>
+<h2 id="สรป">สรุป<a hidden class="anchor" aria-hidden="true" href="#สรป">#</a></h2>
+<p>การใช้ Langgraph ร่วมกับ Deepseek-R1 ทำให้เราสามารถสร้าง AI Agent ที่ชาญฉลาดได้ง่ายขึ้น โดย:</p>
+<ul>
+<li>Langgraph ช่วยจัดการ workflow ของ agent</li>
+<li>Deepseek-R1 ให้ความสามารถในการเข้าใจภาษาธรรมชาติและแปลงเป็น SQL</li>
+<li>ระบบ tools ช่วยให้ agent มีความสามารถที่หลากหลาย</li>
+</ul>
+<p>นี่เป็นเพียงตัวอย่างเบื้องต้น เรายังสามารถพัฒนาต่อยอดได้อีกมาก เช่น:</p>
+<ul>
+<li>เพิ่ม tools ให้ทำงานอื่นๆ ได้</li>
+<li>ปรับปรุง prompt template ให้ฉลาดขึ้น</li>
+<li>เพิ่มความสามารถในการจดจำบริบทการสนทนา</li>
+</ul>
+<h2 id="อางอง">อ้างอิง<a hidden class="anchor" aria-hidden="true" href="#อางอง">#</a></h2>
+<ul>
+<li><a href="https://github.com/toffysoft/agent-example">GitHub Repo</a></li>
+<li><a href="https://python.langchain.com/docs/langgraph">Langgraph Documentation</a></li>
+<li><a href="https://github.com/deepseek-ai/deepseek-LLM">Deepseek-R1</a></li>
+<li><a href="https://ollama.ai/">Ollama</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="http://localhost:1313/tags/ai/">AI</a></li>
+      <li><a href="http://localhost:1313/tags/llm/">LLM</a></li>
+      <li><a href="http://localhost:1313/tags/python/">Python</a></li>
+      <li><a href="http://localhost:1313/tags/ollama/">Ollama</a></li>
+      <li><a href="http://localhost:1313/tags/local-development/">Local Development</a></li>
+      <li><a href="http://localhost:1313/tags/langgraph/">Langgraph</a></li>
+      <li><a href="http://localhost:1313/tags/deepseek/">Deepseek</a></li>
+      <li><a href="http://localhost:1313/tags/sqlite/">Sqlite</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/ollama-python/">
+    <span class="title">Next »</span>
+    <br>
+    <span>ลองเล่น Local LLM ด้วย Ollama &#43; Python</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph on x"
+            href="https://x.com/intent/tweet/?text=%e0%b8%a5%e0%b8%ad%e0%b8%87%e0%b9%80%e0%b8%a5%e0%b9%88%e0%b8%99%20Deepseek-R1%20%e0%b9%81%e0%b8%a5%e0%b8%b0%e0%b8%aa%e0%b8%a3%e0%b9%89%e0%b8%b2%e0%b8%87%20AI%20Agent%20%e0%b8%94%e0%b9%89%e0%b8%a7%e0%b8%a2%20Langgraph&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fagent-example%2f&amp;hashtags=AI%2cLLM%2cPython%2cOllama%2cLocalDevelopment%2cLanggraph%2cDeepseek%2cSqlite">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fagent-example%2f&amp;title=%e0%b8%a5%e0%b8%ad%e0%b8%87%e0%b9%80%e0%b8%a5%e0%b9%88%e0%b8%99%20Deepseek-R1%20%e0%b9%81%e0%b8%a5%e0%b8%b0%e0%b8%aa%e0%b8%a3%e0%b9%89%e0%b8%b2%e0%b8%87%20AI%20Agent%20%e0%b8%94%e0%b9%89%e0%b8%a7%e0%b8%a2%20Langgraph&amp;summary=%e0%b8%a5%e0%b8%ad%e0%b8%87%e0%b9%80%e0%b8%a5%e0%b9%88%e0%b8%99%20Deepseek-R1%20%e0%b9%81%e0%b8%a5%e0%b8%b0%e0%b8%aa%e0%b8%a3%e0%b9%89%e0%b8%b2%e0%b8%87%20AI%20Agent%20%e0%b8%94%e0%b9%89%e0%b8%a7%e0%b8%a2%20Langgraph&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fagent-example%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fagent-example%2f&title=%e0%b8%a5%e0%b8%ad%e0%b8%87%e0%b9%80%e0%b8%a5%e0%b9%88%e0%b8%99%20Deepseek-R1%20%e0%b9%81%e0%b8%a5%e0%b8%b0%e0%b8%aa%e0%b8%a3%e0%b9%89%e0%b8%b2%e0%b8%87%20AI%20Agent%20%e0%b8%94%e0%b9%89%e0%b8%a7%e0%b8%a2%20Langgraph">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fagent-example%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph on whatsapp"
+            href="https://api.whatsapp.com/send?text=%e0%b8%a5%e0%b8%ad%e0%b8%87%e0%b9%80%e0%b8%a5%e0%b9%88%e0%b8%99%20Deepseek-R1%20%e0%b9%81%e0%b8%a5%e0%b8%b0%e0%b8%aa%e0%b8%a3%e0%b9%89%e0%b8%b2%e0%b8%87%20AI%20Agent%20%e0%b8%94%e0%b9%89%e0%b8%a7%e0%b8%a2%20Langgraph%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fagent-example%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph on telegram"
+            href="https://telegram.me/share/url?text=%e0%b8%a5%e0%b8%ad%e0%b8%87%e0%b9%80%e0%b8%a5%e0%b9%88%e0%b8%99%20Deepseek-R1%20%e0%b9%81%e0%b8%a5%e0%b8%b0%e0%b8%aa%e0%b8%a3%e0%b9%89%e0%b8%b2%e0%b8%87%20AI%20Agent%20%e0%b8%94%e0%b9%89%e0%b8%a7%e0%b8%a2%20Langgraph&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fagent-example%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=%e0%b8%a5%e0%b8%ad%e0%b8%87%e0%b9%80%e0%b8%a5%e0%b9%88%e0%b8%99%20Deepseek-R1%20%e0%b9%81%e0%b8%a5%e0%b8%b0%e0%b8%aa%e0%b8%a3%e0%b9%89%e0%b8%b2%e0%b8%87%20AI%20Agent%20%e0%b8%94%e0%b9%89%e0%b8%a7%e0%b8%a2%20Langgraph&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fagent-example%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">Toffysoft&#39;s Blog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

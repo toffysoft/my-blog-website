@@ -8,6 +8,7 @@ tags: ["AI", "LLM", "Python", "Ollama", "Local Development"]
 categories: ["Artificial Intelligence", "Development"]
 cover:
   image: https://ollama.com/public/blog/embedding-models.png
+  caption: "Image from (https://ollama.com/blog/embedding-models)"
 ---
 
 # ลองเล่น Local LLM ด้วย Ollama + Python
