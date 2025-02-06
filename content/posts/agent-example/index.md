@@ -4,7 +4,7 @@ title: "ลองเล่น Deepseek-R1 และสร้าง AI Agent ด�
 date: 2025-02-05
 draft: false
 description: "มาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite ด้วย Deepseek-R1 และ Langgraph กัน"
-tags: ["AI", "LLM", "Python", "Ollama", "Local Development", "Langgraph", "Deepseek", "Sqlite"]
+tags: ["AI", "LLM", "Python", "Ollama", "Local Development", "Langgraph", "Deepseek"]
 categories: ["Artificial Intelligence", "Development", "Programming", "AI"]
 cover:
   image: https://www.kdnuggets.com/wp-content/uploads/awan_deepseekr1_locally_4.png

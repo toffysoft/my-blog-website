@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Sqlite | Toffysoft&#39;s Blog</title>
+<title>SaaS | Toffysoft&#39;s Blog</title>
 <meta name="keywords" content="">
 <meta name="description" content="Toffysoft - https://github.com/toffysoft">
 <meta name="author" content="Toffysoft">
-<link rel="canonical" href="http://localhost:1313/tags/sqlite/">
+<link rel="canonical" href="http://localhost:1313/tags/saas/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.2d6240e602c0dc461084f6be8e56c708e5e1efe1df0e71e2e8d12c0b5b8047a9.css" integrity="sha256-LWJA5gLA3EYQhPa&#43;jlbHCOXh7&#43;HfDnHi6NEsC1uAR6k=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
@@ -18,8 +18,8 @@
 <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/sqlite/index.xml">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/tags/sqlite/">
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/saas/index.xml">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/tags/saas/">
 <noscript>
     <style>
         #theme-toggle,
@@ -28,16 +28,16 @@
         }
 
     </style>
-</noscript><meta property="og:url" content="http://localhost:1313/tags/sqlite/">
+</noscript><meta property="og:url" content="http://localhost:1313/tags/saas/">
   <meta property="og:site_name" content="Toffysoft&#39;s Blog">
-  <meta property="og:title" content="Sqlite">
+  <meta property="og:title" content="SaaS">
   <meta property="og:description" content="Toffysoft - https://github.com/toffysoft">
   <meta property="og:locale" content="th-th">
   <meta property="og:type" content="website">
       <meta property="og:image" content="http://localhost:1313/images/papermod-cover.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://localhost:1313/images/papermod-cover.png">
-<meta name="twitter:title" content="Sqlite">
+<meta name="twitter:title" content="SaaS">
 <meta name="twitter:description" content="Toffysoft - https://github.com/toffysoft">
 
 </head>
@@ -107,8 +107,8 @@
 <main class="main"> 
 <header class="page-header"><div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/tags/">Tags</a></div>
   <h1>
-    Sqlite
-    <a href="/tags/sqlite/index.xml" title="RSS" aria-label="RSS">
+    SaaS
+    <a href="/tags/saas/index.xml" title="RSS" aria-label="RSS">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round" height="23">
         <path d="M4 11a9 9 0 0 1 9 9" />
@@ -120,22 +120,22 @@
 </header>
 
 <article class="post-entry tag-entry"> 
-<figure class="entry-cover"><img loading="lazy" src="https://www.kdnuggets.com/wp-content/uploads/awan_deepseekr1_locally_4.png" alt="Image from (https://www.kdnuggets.com/using-deepseek-r1-locally)">
-</figure>
   <header class="entry-header">
-    <h2 class="entry-hint-parent">ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph
+    <h2 class="entry-hint-parent">AI Agent กับการเปลี่ยนแปลงวงการ SaaS: เมื่อซอฟต์แวร์กลายเป็นผู้ช่วยอัจฉริยะ
     </h2>
   </header>
   <div class="entry-content">
-    <p>ในบทความนี้เราจะมาทดลองสร้าง AI Agent ที่สามารถโต้ตอบกับฐานข้อมูล SQLite โดยใช้ Deepseek-R1 ซึ่งเป็น Open Source Language Model ร่วมกับ Langgraph ซึ่งเป็นเครื่องมือสำหรับสร้าง AI workflows แบบใหม่จาก LangChain
-โครงสร้างของโปรเจค โปรเจคของเราประกอบด้วยไฟล์หลัก 2 ไฟล์:
-setup.py - สำหรับสร้างและจัดการฐานข้อมูล SQLite agent.py - สำหรับสร้าง AI Agent ที่จะโต้ตอบกับฐานข้อมูล การสร้างฐานข้อมูล เริ่มต้นจาก setup.py ที่ใช้สร้างฐานข้อมูลสินค้าตัวอย่าง โดยมีตาราง products ที่เก็บข้อมูลต่างๆ เช่น:
-id (PRIMARY KEY) name price category stock description last_updated โค้ดส่วนนี้จะสร้างฐานข้อมูลพร้อมข้อมูลตัวอย่างกว่า 100 รายการ แบ่งเป็นหมวดหมู่ต่างๆ เช่น Smartphones, Laptops, TVs, Audio เป็นต้น
-# setup.py import sqlite3 import os from datetime import datetime def init_database(): try: db_path = os.path.join(os.path.dirname(__file__), &#39;products.db&#39;) conn = sqlite3.connect(db_path) cursor = conn.cursor() cursor.execute(&#39;DROP TABLE IF EXISTS products&#39;) cursor.execute(&#39;&#39;&#39; CREATE TABLE IF NOT EXISTS products ( id INTEGER PRIMARY KEY, name TEXT NOT NULL, price REAL NOT NULL, category TEXT NOT NULL, stock INTEGER NOT NULL, description TEXT, last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ) &#39;&#39;&#39;) cursor.execute(&#39;CREATE INDEX IF NOT EXISTS idx_products_category ON products(category)&#39;) cursor.execute(&#39;CREATE INDEX IF NOT EXISTS idx_products_price ON products(price)&#39;) cursor.execute(&#39;CREATE INDEX IF NOT EXISTS idx_products_stock ON products(stock)&#39;) products_data = [ # Smartphones (1, &#39;iPhone 15 Pro Max&#39;, 48900.00, &#39;Smartphones&#39;, 45, &#39;1TB storage, titanium finish&#39;), (2, &#39;iPhone 15 Pro&#39;, 42900.00, &#39;Smartphones&#39;, 50, &#39;256GB storage, A17 Pro chip&#39;), (3, &#39;iPhone 15&#39;, 32900.00, &#39;Smartphones&#39;, 60, &#39;128GB storage, A16 chip&#39;), (4, &#39;Samsung Galaxy S24 Ultra&#39;, 45900.00, &#39;Smartphones&#39;, 40, &#39;512GB storage, S Pen included&#39;), (5, &#39;Samsung Galaxy S24&#43;&#39;, 35900.00, &#39;Smartphones&#39;, 45, &#39;256GB storage, AI features&#39;), (6, &#39;Samsung Galaxy S24&#39;, 29900.00, &#39;Smartphones&#39;, 55, &#39;128GB storage&#39;), (7, &#39;Google Pixel 8 Pro&#39;, 35900.00, &#39;Smartphones&#39;, 35, &#39;Advanced AI camera features&#39;), (8, &#39;Google Pixel 8&#39;, 27900.00, &#39;Smartphones&#39;, 40, &#39;Android flagship&#39;), (9, &#39;OnePlus 12&#39;, 31900.00, &#39;Smartphones&#39;, 30, &#39;Snapdragon 8 Gen 3&#39;), (10, &#39;Xiaomi 14 Pro&#39;, 29900.00, &#39;Smartphones&#39;, 40, &#39;Leica optics&#39;), # Laptops (11, &#39;MacBook Pro 16&#34;&#39;, 89900.00, &#39;Laptops&#39;, 25, &#39;M3 Max chip, 32GB RAM&#39;), ........ ] cursor.executemany(&#39;&#39;&#39; INSERT OR REPLACE INTO products (id, name, price, category, stock, description) VALUES (?, ?, ?, ?, ?, ?) &#39;&#39;&#39;, products_data) conn.commit() print(&#34;Database initialized successfully!&#34;) return conn except sqlite3.Error as e: print(f&#34;SQLite error: {e}&#34;) return None except Exception as e: print(f&#34;Error: {e}&#34;) return None def main(): conn = init_database() if not conn: print(&#34;Failed to initialize database&#34;) return if __name__ == &#34;__main__&#34;: main() เราสามารถสร้างฐานข้อมูลด้วยคำสั่ง:
+    <p>AI Agent กับการปฏิวัติวงการ SaaS: เมื่อซอฟต์แวร์กลายเป็นผู้ช่วยอัจฉริยะ ในยุคที่เทคโนโลยี AI กำลังก้าวหน้าอย่างรวดเร็ว เราจะได้เห็นการเปลี่ยนแปลงครั้งใหญ่ในวงการซอฟต์แวร์แบบ SaaS (Software-as-a-Service) ที่จะถูกขับเคลื่อนด้วย AI Agent หรือตัวแทนอัจฉริยะ บทความนี้จะพาคุณไปทำความเข้าใจว่า AI Agent จะเข้ามาเปลี่ยนแปลงการใช้งานซอฟต์แวร์ของเราอย่างไรบ้าง
+การปรับแต่งประสบการณ์ผู้ใช้แบบเฉพาะบุคคลขั้นสูง ลองนึกภาพว่าซอฟต์แวร์ของคุณสามารถปรับเปลี่ยนตัวเองให้เข้ากับการทำงานของคุณได้โดยอัตโนมัติ ไม่ใช่แค่หน้าจอเดิมๆ ที่ทุกคนเห็นเหมือนกัน แต่เป็นระบบที่เข้าใจพฤติกรรม บทบาท และความชอบของคุณ
+ตัวอย่างเช่น ในซอฟต์แวร์จัดการโครงการ ระบบจะแสดงรายการงานที่เกี่ยวข้องกับโครงการล่าสุดของคุณ พร้อมแนะนำทรัพยากรที่เหมาะสม และสร้างทางลัดที่สอดคล้องกับรูปแบบการทำงานของคุณ นอกจากนี้ ระบบยังสามารถเตือนให้คุณทำงานที่ค้างอยู่ให้เสร็จ ชี้ให้เห็นความผิดปกติในรายงานการเงิน หรือแนะนำพารามิเตอร์ที่เหมาะสมสำหรับแคมเปญการตลาด โดยที่คุณไม่ต้องถามเลย
+การทำงานอัตโนมัติที่ชาญฉลาด AI Agent ไม่ได้แค่ให้คำแนะนำ แต่สามารถดำเนินการแทนคุณได้ด้วย สมมติว่าคุณใช้ซอฟต์แวร์สำหรับงานบริการลูกค้า แทนที่จะแค่แนะนำเทมเพลตอีเมล ระบบสามารถ:
+เขียนอีเมลตอบกลับที่ปรับแต่งให้เหมาะกับแต่ละลูกค้า จัดการนัดหมายโดยอัตโนมัติ เริ่มขั้นตอนการแก้ไขปัญหาเบื้องต้นได้เอง ที่สำคัญคือ AI Agent สามารถเรียนรู้จากข้อมูลในอดีตและการตอบสนองของผู้ใช้ เมื่อพบรูปแบบการทำงานที่เกิดขึ้นซ้ำๆ เช่น การตอบกลับติกเก็ตสนับสนุนประเภทหนึ่งที่ต้องใช้คำตอบแบบเดียวกันเสมอ ระบบจะสามารถเสนอหรือสร้างระบบอัตโนมัติใหม่ได้เอง โดยที่คุณไม่ต้องตั้งค่าอะไรเพิ่มเติม
+การวิเคราะห์ข้อมูลและสร้างข้อมูลเชิงลึกขั้นสูง ลืมเรื่องการเขียนคำสั่ง SQL หรือการเรียนรู้ภาษาสำหรับสืบค้นข้อมูลที่ซับซ้อนไปได้เลย ด้วย AI Agent คุณสามารถถามคำถามด้วยภาษาธรรมชาติได้ เช่น “แคมเปญการตลาดไหนที่มีอัตราการเปลี่ยนเป็นลูกค้าสูงที่สุดในไตรมาสที่แล้ว?” แล้วระบบจะให้ข้อมูลเชิงลึกที่มีความหมายกลับมา
+นอกจากนี้ AI Agent ยังสามารถแจ้งเตือนเชิงรุกเกี่ยวกับ:
 ...</p>
   </div>
-  <footer class="entry-footer"><span title='2025-02-05 00:00:00 +0000 UTC'>February 5, 2025</span>&nbsp;·&nbsp;7 min&nbsp;·&nbsp;Apiwat Ruangkanjanapaisarn</footer>
-  <a class="entry-link" aria-label="post link to ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph" href="http://localhost:1313/posts/agent-example/"></a>
+  <footer class="entry-footer"><span title='2025-02-06 00:00:00 +0000 UTC'>February 6, 2025</span>&nbsp;·&nbsp;2 min&nbsp;·&nbsp;Apiwat Ruangkanjanapaisarn</footer>
+  <a class="entry-link" aria-label="post link to AI Agent กับการเปลี่ยนแปลงวงการ SaaS: เมื่อซอฟต์แวร์กลายเป็นผู้ช่วยอัจฉริยะ" href="http://localhost:1313/posts/agentic-ai/agents-transform-saas/"></a>
 </article>
     </main>
     

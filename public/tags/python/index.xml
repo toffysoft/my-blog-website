@@ -11,8 +11,15 @@
     </image>
     <generator>Hugo -- 0.143.0</generator>
     <language>th-th</language>
-    <lastBuildDate>Wed, 05 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 06 Feb 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ทำความรู้จักกับ Agentic Design Patterns: รูปแบบการออกแบบ AI ที่ช่วยให้ระบบทำงานได้อย่างชาญฉลาด</title>
+      <link>http://localhost:1313/posts/agentic-ai/agentic-design-patterns/</link>
+      <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agentic-ai/agentic-design-patterns/</guid>
+      <description>เจาะลึกรูปแบบการออกแบบ AI ที่ช่วยให้ระบบ AI สามารถคิด ตัดสินใจ และทำงานได้อย่างอิสระ พร้อมตัวอย่างการประยุกต์ใช้งานในโลกจริง</description>
+    </item>
     <item>
       <title>ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph</title>
       <link>http://localhost:1313/posts/agent-example/</link>

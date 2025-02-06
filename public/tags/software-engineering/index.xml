@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Software Engineering on Toffysoft&#39;s Blog</title>
+    <link>http://localhost:1313/tags/software-engineering/</link>
+    <description>Recent content in Software Engineering on Toffysoft&#39;s Blog</description>
+    <image>
+      <title>Toffysoft&#39;s Blog</title>
+      <url>http://localhost:1313/images/papermod-cover.png</url>
+      <link>http://localhost:1313/images/papermod-cover.png</link>
+    </image>
+    <generator>Hugo -- 0.143.0</generator>
+    <language>th-th</language>
+    <lastBuildDate>Thu, 06 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/software-engineering/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ทำความรู้จักกับ Agentic Design Patterns: รูปแบบการออกแบบ AI ที่ช่วยให้ระบบทำงานได้อย่างชาญฉลาด</title>
+      <link>http://localhost:1313/posts/agentic-ai/agentic-design-patterns/</link>
+      <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agentic-ai/agentic-design-patterns/</guid>
+      <description>เจาะลึกรูปแบบการออกแบบ AI ที่ช่วยให้ระบบ AI สามารถคิด ตัดสินใจ และทำงานได้อย่างอิสระ พร้อมตัวอย่างการประยุกต์ใช้งานในโลกจริง</description>
+    </item>
+  </channel>
+</rss>

@@ -11,8 +11,50 @@
     </image>
     <generator>Hugo -- 0.143.0</generator>
     <language>th-th</language>
-    <lastBuildDate>Wed, 05 Feb 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 06 Feb 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/categories/artificial-intelligence/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>เข้าใจ AI Agent: จากซอฟต์แวร์สู่หุ่นยนต์มนุษย์</title>
+      <link>http://localhost:1313/posts/agentic-ai/understanding-ai-agents/</link>
+      <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agentic-ai/understanding-ai-agents/</guid>
+      <description>บทความที่จะพาคุณทำความเข้าใจเกี่ยวกับ AI Agent ตั้งแต่พื้นฐานไปจนถึงการประยุกต์ใช้ในโลกแห่งความเป็นจริง</description>
+    </item>
+    <item>
+      <title>AI Agent กับการเปลี่ยนแปลงวงการ SaaS: เมื่อซอฟต์แวร์กลายเป็นผู้ช่วยอัจฉริยะ</title>
+      <link>http://localhost:1313/posts/agentic-ai/agents-transform-saas/</link>
+      <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agentic-ai/agents-transform-saas/</guid>
+      <description>บทความนี้จะพาคุณไปทำความรู้จักกับการเปลี่ยนแปลงครั้งใหญ่ในวงการ SaaS ผ่าน AI Agent ที่จะมาปฏิวัติวิธีการใช้งานซอฟต์แวร์ในอนาคต</description>
+    </item>
+    <item>
+      <title>Multi-Agent Systems: เข้าใจอนาคตของการทำงานร่วมกันของ AI</title>
+      <link>http://localhost:1313/posts/agentic-ai/multi-agent-systems/</link>
+      <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agentic-ai/multi-agent-systems/</guid>
+      <description>เจาะลึกระบบ Multi-Agent ตั้งแต่พื้นฐานไปจนถึงการประยุกต์ใช้งานจริง พร้อมตัวอย่างที่เข้าใจง่าย</description>
+    </item>
+    <item>
+      <title>เข้าใจองค์ประกอบหลักของ AI Agent: จากพื้นฐานสู่การประยุกต์ใช้งาน</title>
+      <link>http://localhost:1313/posts/agentic-ai/components-of-agents/</link>
+      <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agentic-ai/components-of-agents/</guid>
+      <description>บทความนี้จะพาคุณเจาะลึกถึงองค์ประกอบสำคัญของ AI Agent ตั้งแต่การกำหนดบุคลิกพื้นฐานไปจนถึงการพัฒนาระบบที่ซับซ้อน</description>
+    </item>
+    <item>
+      <title>การเปลี่ยนแปลงครั้งใหญ่: สถาปัตยกรรม AI Agent รุ่นใหม่และการปฏิวัติการทำงานของซอฟต์แวร์</title>
+      <link>http://localhost:1313/posts/agentic-ai/next-generation-architecture/</link>
+      <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agentic-ai/next-generation-architecture/</guid>
+      <description>เจาะลึกวิธีการที่ AI Agent กำลังเปลี่ยนแปลงวิธีการที่เราใช้งานและพัฒนาซอฟต์แวร์ ผ่านการใช้ภาษาธรรมชาติแทนที่การเขียนโค้ดแบบดั้งเดิม</description>
+    </item>
+    <item>
+      <title>ทำความรู้จักกับ Agentic Design Patterns: รูปแบบการออกแบบ AI ที่ช่วยให้ระบบทำงานได้อย่างชาญฉลาด</title>
+      <link>http://localhost:1313/posts/agentic-ai/agentic-design-patterns/</link>
+      <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/agentic-ai/agentic-design-patterns/</guid>
+      <description>เจาะลึกรูปแบบการออกแบบ AI ที่ช่วยให้ระบบ AI สามารถคิด ตัดสินใจ และทำงานได้อย่างอิสระ พร้อมตัวอย่างการประยุกต์ใช้งานในโลกจริง</description>
+    </item>
     <item>
       <title>ลองเล่น Deepseek-R1 และสร้าง AI Agent ด้วย Langgraph</title>
       <link>http://localhost:1313/posts/agent-example/</link>
